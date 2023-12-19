@@ -1,13 +1,11 @@
 #ifndef MAIN_HPP
 # define MAIN_HPP
 
-
-# include <iostream>
-# include <string>
-# include <vector>
-# include <map>
-# include <algorithm>
-# include <unordered_set>
+#include <vector>
+#include <map>
+#include <string>
+#include <iostream>
+#include <unordered_set>
 
 # include "Creature.hpp"
 # include "Drone.hpp"

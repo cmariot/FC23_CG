@@ -1,6 +1,5 @@
 #include "main.hpp"
 
-
 void parse_creatures(std::map<int, Creature> &creatures)
 {
 

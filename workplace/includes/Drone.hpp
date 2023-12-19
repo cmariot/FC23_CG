@@ -1,11 +1,6 @@
 #ifndef DRONE_HPP
 # define DRONE_HPP
 
-#include <vector>
-#include <map>
-#include <string>
-
-
 class Drone
 {
 

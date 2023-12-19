@@ -1,24 +1,19 @@
 #ifndef PLAYER_HPP
 # define PLAYER_HPP
 
-#include <map>
-#include <iostream>
-#include <unordered_set>
-
-#include "Drone.hpp"
-
-
 class Player
 {
-    public:
-        int score;                           // current score
-        std::map<int, Drone> drones;         //
-        std::unordered_set<int> saved_scans; //
 
-        int scan_count; // amount of SAVED scans
-        int drone_count;
-        int creature_count;
-        int radar_count;
+    public:
+
+        int score;                              // current score
+        std::map<int, Drone> drones;            // map of drones, key is drone_id
+        std::unordered_set<int> saved_scans;    // set of saved scans, key is creature_id
+
+        int scan_count;                         // amount of SAVED scans
+        int drone_count;                        // amount of drones
+        int creature_count;                     // amount of creatures
+        int radar_count;                        // amount of radars
 
         Player(void)
         {
@@ -43,14 +38,15 @@ class Player
             int drone_y;
             int emergency;
             int battery;
+
             std::cin >> drone_id >> drone_x >> drone_y >> emergency >> battery;
             std::cin.ignore();
-            this->drones.insert(std::pair<int, Drone>(drone_id, Drone(
-                                                                    drone_id,
-                                                                    drone_x,
-                                                                    drone_y,
-                                                                    emergency,
-                                                                    battery)));
+
+            this->drones.insert(
+                std::pair<int, Drone>(
+                    drone_id, Drone(drone_id, drone_x, drone_y, emergency, battery)
+                )
+            );
         }
 
         void update_saved_scans()
@@ -79,9 +75,9 @@ class Player
             this->drones.at(drone_id).light = light;
 
             if (light)
-                this->drones.at(drone_id).battery -= 1;
+                this->drones.at(drone_id).battery -= 5;
             else
-                this->drones.at(drone_id).battery -= 2;
+                this->drones.at(drone_id).battery += 1;
         }
 };
 
