@@ -8,12 +8,16 @@ CPPFLAGS	=	-MMD
 CXXFLAGS	=	-Wall -Wextra #-Werror
 
 #ADD YOUR SOURCES BELOW WITHOUT THE SOURCE PREFIX MAIN.C GIVEN AS EXAMPLE
-SRCS		=	main.cpp
+SRCS		=	main.cpp \
+				parsing.cpp \
 
 #IF YOU HAVE HEADER FILES YOU ABSOLUTELY NEED TO ADD THEM IN THE INC_FILES VAR
-INC_FILES	= main.hpp
+INC_FILES	= main.hpp \
+			  Creature.hpp \
+			  Drone.hpp \
+			  Player.hpp \
 
-			
+
 INC_PATH	=	includes/
 INC			=	-I $(INC_PATH)
 
@@ -42,7 +46,7 @@ $(OBJS_PATH):
 $(OBJS_PATH)%.o:	$(SRCS_PATH)%.cpp
 					@mkdir -p $(dir $@)
 					$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(INC)
-				
+
 
 clean:
 		rm -rf $(OBJS_PATH)
