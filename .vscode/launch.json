@@ -3,11 +3,22 @@
   "configurations": [
     {
       "name": "C/C++ Runner: Debug Session",
-      "type": "lldb",
+      "type": "cppdbg",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/cmariot/42/codingame",
-      "program": "/Users/cmariot/42/codingame/build/Debug/outDebug"
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "cwd": "/mnt/nfs/homes/cmariot/42/FC23_CG",
+      "program": "/mnt/nfs/homes/cmariot/42/FC23_CG/build/Debug/outDebug",
+      "MIMode": "lldb",
+      "miDebuggerPath": "lldb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
     }
   ]
 }
