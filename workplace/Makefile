@@ -13,10 +13,10 @@ SRCS		=	main.cpp \
 
 #IF YOU HAVE HEADER FILES YOU ABSOLUTELY NEED TO ADD THEM IN THE INC_FILES VAR
 INC_FILES	= main.hpp \
+			  vector.hpp \
 			  Creature.hpp \
 			  Drone.hpp \
 			  Player.hpp \
-			  vector.hpp
 
 
 INC_PATH	=	includes/

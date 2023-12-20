@@ -1,0 +1,878 @@
+#ifndef MAIN_HPP
+# define MAIN_HPP
+
+#include <vector>
+#include <map>
+#include <string>
+#include <iostream>
+#include <unordered_set>
+
+class Creature;
+class Player;
+namespace ft
+{
+    template <typename T>
+    class Vector;
+}
+
+
+void update_score(Player &me, Player &foe);
+void parse_creatures(std::map<int, Creature> &creatures);
+void update_unsaved_scans(Player &me, Player &foe);
+void update_visible_creatures(std::map<int, Creature> &creatures);
+void update_blips(Player &me, Player &foe);
+
+
+#endif // MAIN_HPP
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cmariot <cmariot@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/12/05 14:48:41 by cmariot           #+#    #+#             */
+/*   Updated: 2023/12/20 10:25:56 by cmariot          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
+
+#include <vector>
+#include <list>
+#include <initializer_list>
+#include <cmath>
+#include <stdexcept>
+#include <iostream>
+
+namespace ft
+{
+
+    // template <typename T>
+    // class Matrix;
+
+    template <typename T>
+    class Vector
+    {
+
+        /*
+        Vectors are ordered lists of objects that can be accessed by their index.
+        */
+
+        typedef T               value_type;
+        typedef T &             reference;
+        typedef const T &       const_reference;
+        typedef size_t          size_type;
+
+
+        public:
+
+            Vector();
+            Vector(size_type size);
+            Vector(size_type size, const_reference val);
+            // Vector(std::initializer_list<T> initList);
+            Vector(const Vector &copy);
+            // Vector(const Matrix<T> &copy);
+
+            ~Vector();
+
+            size_type size() const;
+
+            // Addition : Add two vectors
+            Vector operator+(const Vector &rhs) const
+            {
+                Vector result(*this);
+
+                if (result.size() != rhs.size())
+                    throw std::length_error("Vectors are not the same size.");
+                for (size_type i = 0; i < result.size(); i++)
+                    result[i] += rhs[i];
+                return result;
+            }
+
+            // Operator += : Add two vectors
+            Vector &operator+=(const Vector &rhs)
+            {
+                if (this->size() != rhs.size())
+                    throw std::length_error("Vectors are not the same size.");
+                for (size_type i = 0; i < this->size(); i++)
+                    (*this)[i] += rhs[i];
+                return *this;
+            }
+
+            // add : Add two vectors
+            Vector &add(const Vector &rhs)
+            {
+                if (this->size() != rhs.size())
+                    throw std::length_error("Vectors are not the same size.");
+                for (size_type i = 0; i < this->size(); i++)
+                    (*this)[i] += rhs[i];
+                return *this;
+            }
+
+            // Substraction : Substract two vectors
+            Vector operator-(const Vector &rhs) const
+            {
+                Vector result(*this);
+
+                if (result.size() != rhs.size())
+                    throw std::length_error("Vectors are not the same size.");
+                for (size_type i = 0; i < result.size(); i++)
+                    result[i] -= rhs[i];
+                return result;
+            }
+
+            // Operator -= : Substract two vectors
+            Vector &operator-=(const Vector &rhs)
+            {
+                if (this->size() != rhs.size())
+                    throw std::length_error("Vectors are not the same size.");
+                for (size_type i = 0; i < this->size(); i++)
+                    (*this)[i] -= rhs[i];
+                return *this;
+            }
+
+            // Substract : Substract two vectors
+            Vector &sub(const Vector &rhs)
+            {
+                if (this->size() != rhs.size())
+                    throw std::length_error("Vectors are not the same size.");
+                for (size_type i = 0; i < this->size(); i++)
+                    (*this)[i] -= rhs[i];
+                return *this;
+            }
+
+            // Operator * : Scale a vector by a scalar
+            Vector operator*(const_reference rhs) const
+            {
+                Vector result(*this);
+
+                for (size_type i = 0; i < result.size(); i++)
+                    result[i] *= rhs;
+                return result;
+            }
+
+            // Operator *= : Scale a vector
+            Vector operator*=(const_reference rhs)
+            {
+                for (size_type i = 0; i < this->size(); i++)
+                    (*this)[i] *= rhs;
+                return *this;
+            }
+
+            // Scale : Scale a vector
+            Vector &scl(const_reference rhs)
+            {
+                for (size_type i = 0; i < this->size(); i++)
+                    (*this)[i] *= rhs;
+                return *this;
+            }
+
+            // Linear combination : Linear combination of two vectors
+            static Vector linear_combination(const std::list<Vector<double> > &u, const std::list<double> &v)
+            {
+                /*
+                Linear combination of two lists u and v is a vector w defined as:
+                w = v1 * u1 + v2 * u2 + ... + vn * un
+
+                Example:
+
+                    u = list({1, 0, 0}, {0, 1, 0}, {0, 0, 1})
+                    v = {10, -2, 0.5}
+
+                    w = 10 * u1 + (-2) * u2 + 0.5 * u3
+                    w = {10, -2, 0.5}
+
+                It's used to get the span of a set of vectors.
+                The span of a set of vectors is the set of all possible linear combinations of the vectors.
+
+                */
+
+                if (u.size() != v.size())
+                    throw std::length_error("Lists are not the same size.");
+                else if (u.size() == 0)
+                    throw std::length_error("Lists are empty.");
+
+                std::list<Vector<double> >::const_iterator it_u = u.begin();
+                std::list<double>::const_iterator         it_v = v.begin();
+                ft::Vector<double>                        lin_comb((*it_u).size());
+
+                // For each element in u and v
+                for (; it_u != u.end(); ++it_u, ++it_v)
+                {
+
+                    // Check if all vectors in u have the same size
+                    if ((*it_u).size() != lin_comb.size())
+                        throw std::length_error("Vectors are not the same dimension.");
+                    else if ((*it_u).size() == 0)
+                        throw std::length_error("Vectors are empty.");
+
+                    // Compute the linear combination
+                    for (size_type i = 0; i < lin_comb.size(); i++)
+                        lin_comb[i] = std::fma((*it_u)[i], *it_v, lin_comb[i]);
+
+                }
+                return lin_comb;
+            }
+
+
+            // Dot product : Dot product of two vectors
+            double dot(const Vector<T> & rhs) const
+            {
+                if (this->size() != rhs.size())
+                    throw std::length_error("Vectors are not the same size.");
+
+                typename std::vector<T>::const_iterator it1 = this->_vector.begin();
+                typename std::vector<T>::const_iterator it2 = rhs._vector.begin();
+                double result = 0.0;
+
+                while (it1 != this->_vector.end())
+                {
+                    result = std::fma(*it1, *it2, result);
+                    ++it1;
+                    ++it2;
+                }
+                return result;
+            }
+
+            double norm_1() const
+            {
+                /*
+                The 1-norm is simply the sum of the absolute values of the columns.
+                */
+
+                typename std::vector<T>::const_iterator it = this->_vector.begin();
+                double result = 0.0;
+
+                while (it != this->_vector.end())
+                {
+                    result += std::max(-*it, *it);
+                    ++it;
+                }
+                return result;
+            }
+
+            double norm() const
+            {
+                /*
+                Euclidean norm is the square root of the sum of the squares of the elements.
+
+                pythagore : a^2 + b^2 = c^2
+                -> c = sqrt(a^2 + b^2)
+                */
+
+                typename std::vector<T>::const_iterator it = this->_vector.begin();
+                double result = 0.0;
+
+                while (it != this->_vector.end())
+                {
+                    result = std::fma(*it, *it, result);
+                    ++it;
+                }
+                return std::pow(result, 0.5);
+            }
+
+            double norm_inf() const
+            {
+                /*
+                Infinity norm is the maximum absolute value of the elements.
+                */
+
+                typename std::vector<T>::const_iterator it = this->_vector.begin();
+                double result = 0.0;
+
+                while (it != this->_vector.end())
+                {
+                    result = std::max(result, std::max(-*it, *it));
+                    ++it;
+                }
+                return result;
+
+            }
+
+            // Operator << : Display the vector
+            friend std::ostream &operator<<(std::ostream &os, const Vector &vector)
+            {
+                os << "[";
+                for (size_type i = 0; i < vector._vector.size(); i++)
+                {
+                    os << vector._vector[i];
+                    if (i < vector._vector.size() - 1)
+                        os << ", ";
+                }
+                os << "]";
+                return os;
+            }
+
+            // Operator [] : Access element
+            reference operator[](size_type pos)
+            {
+                return _vector[pos];
+            }
+
+            const_reference operator[](size_type pos) const
+            {
+                return _vector[pos];
+            }
+
+            // Operator = : Assign content
+            Vector &operator=(const Vector &rhs)
+            {
+                _vector = rhs._vector;
+                return *this;
+            }
+
+            Vector &operator=(Vector &rhs)
+            {
+                _vector = rhs._vector;
+                return *this;
+            }
+
+            // Operator == : Compare content
+            bool operator==(const Vector &rhs) const
+            {
+                if (_vector.size() != rhs._vector.size())
+                {
+                    std::cout << "Size is different" << std::endl;
+                    return false;
+                }
+                for (size_type i = 0; i < _vector.size(); i++)
+                {
+                    if (_vector[i] != rhs._vector[i])
+                    {
+                        std::cout << "Element " << i << " is different" << std::endl;
+                        std::cout << "lhs = " << _vector[i] << std::endl;
+                        std::cout << "rhs = " << rhs._vector[i] << std::endl;
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            // Operator != : Compare content
+            bool operator!=(const Vector &rhs) const
+            {
+                return !(*this == rhs);
+            }
+
+        private:
+
+            std::vector<T> _vector;
+
+    };
+
+
+}
+
+// Constructor : Default
+template <typename T>
+ft::Vector<T>::Vector()
+{
+    _vector = std::vector<T>();
+}
+
+// Constructor : Size
+template <typename T>
+ft::Vector<T>::Vector(size_type size)
+{
+    _vector = std::vector<T>(size);
+}
+
+// Constructor : Size and value
+template <typename T>
+ft::Vector<T>::Vector(size_type size, const_reference val)
+{
+    _vector = std::vector<T>(size, val);
+}
+
+// Constructor : Copy
+template <typename T>
+ft::Vector<T>::Vector(const Vector &copy)
+{
+    _vector = copy._vector;
+}
+
+// // Constructor : Copy from Matrix
+// template <typename T>
+// ft::Vector<T>::Vector(const Matrix<T> &copy)
+// {
+//     for (size_type i = 0; i < copy.size()[0]; i++)
+//         for (size_type j = 0; j < copy.size()[1]; j++)
+//             _vector.push_back(copy[i][j]);
+// }
+
+// Constructor : Initializer list
+// template <typename T>
+// ft::Vector<T>::Vector(std::initializer_list<T> initList)
+// {
+//     _vector = std::vector<T>(initList);
+// }
+
+// Destructor
+template <typename T>
+ft::Vector<T>::~Vector()
+{
+    _vector.clear();
+}
+
+
+// Size
+template <typename T>
+typename ft::Vector<T>::size_type ft::Vector<T>::size() const
+{
+    return _vector.size();
+}
+
+
+
+#endif
+#ifndef CREATURE_HPP
+# define CREATURE_HPP
+
+
+class Creature
+{
+
+    public:
+
+        int id;
+        int color;
+        int type;
+
+        bool is_visible;
+
+        // Position
+        ft::Vector<int> position;
+
+        // Velocity
+        ft::Vector<int> velocity;
+
+        Creature(int id, int color, int type)
+        {
+            this->id = id;
+            this->color = color;
+            this->type = type;
+            this->is_visible = false;
+            this->position = ft::Vector<int>(2);
+            this->velocity = ft::Vector<int>(2);
+        }
+
+        void update_position(int x, int y)
+        {
+            this->position[0] = x;
+            this->position[1] = y;
+        }
+
+        void update_velocity(int vx, int vy)
+        {
+            this->velocity[0] = vx;
+            this->velocity[1] = vy;
+        }
+
+        void update_visibility(bool is_visible)
+        {
+            this->is_visible = is_visible;
+        }
+
+        void reset_visibility(void)
+        {
+            this->is_visible = false;
+        }
+};
+
+#endif // CREATURE_HPP
+#ifndef DRONE_HPP
+# define DRONE_HPP
+
+
+#include <iostream>
+
+class Drone
+{
+
+    public:
+
+        int id;
+        ft::Vector<int> position;
+        ft::Vector<int> direction;
+        int max_move;
+
+        int emergency;
+        int battery;
+        bool light;
+
+        std::vector<int> scaned_creatures_id;
+        std::map<int, std::string> blips;
+
+        Drone(int id, int x, int y, int emergency, int battery)
+        {
+            this->id = id;
+
+            // position
+            this->position = ft::Vector<int>(2);
+            this->position[0] = x;
+            this->position[1] = y;
+
+            // direction
+            this->direction = ft::Vector<int>(2);
+            direction_down();
+
+            this->emergency = emergency;
+            this->battery = battery;
+            this->scaned_creatures_id = std::vector<int>();
+            this->scaned_creatures_id.reserve(12);
+            this->light = false;
+            this->blips = std::map<int, std::string>();
+        }
+
+        void update_position(int x, int y)
+        {
+            this->position[0] = x;
+            this->position[1] = y;
+        }
+
+        void update_emergency(int emergency)
+        {
+            this->emergency = emergency;
+        }
+
+        void update_battery(int battery)
+        {
+            this->battery = battery;
+        }
+
+        void update_light(bool light)
+        {
+            this->light = light;
+        }
+
+        void add_blip(const int &creature_id, const std::string &blip)
+        {
+            this->blips.insert(std::pair<int, std::string>(creature_id, blip));
+        }
+
+        void direction_down()
+        {
+            this->direction[0] = 0;
+            this->direction[1] = 1;
+        }
+
+        void direction_left()
+        {
+            this->direction[0] = -1;
+            this->direction[1] = 0;
+        }
+
+        void direction_right()
+        {
+            this->direction[0] = 1;
+            this->direction[1] = 0;
+        }
+
+        void direction_up()
+        {
+            this->direction[0] = 0;
+            this->direction[1] = -1;
+        }
+
+        void move()
+        {
+            this->position[0] += (600 * this->direction[0]);
+            this->position[1] += (600 * this->direction[1]);
+            std::cout << "MOVE " << this->position[0] << " " << this->position[1] << " " << (int)this->light << std::endl;
+        }
+
+
+};
+
+#endif // DRONE_HPP
+#ifndef PLAYER_HPP
+# define PLAYER_HPP
+
+class Player
+{
+
+    public:
+
+        int score;                              // current score
+        std::map<int, Drone> drones;            // map of drones, key is drone_id
+        std::unordered_set<int> saved_scans;    // set of saved scans, key is creature_id
+
+        int scan_count;                         // amount of SAVED scans
+        int drone_count;                        // amount of drones
+        int creature_count;                     // amount of creatures
+        int radar_count;                        // amount of radars
+
+        Player(void)
+        {
+            this->drones = std::map<int, Drone>();
+        }
+
+        void update_drones()
+        {
+            int my_drone_count;
+            std::cin >> my_drone_count;
+            std::cin.ignore();
+            for (int i = 0; i < my_drone_count; i++)
+                this->addDrone();
+        }
+
+        void addDrone(void)
+        {
+            int drone_id;
+            int drone_x;
+            int drone_y;
+            int emergency;
+            int battery;
+
+            std::cin >> drone_id >> drone_x >> drone_y >> emergency >> battery;
+            std::cin.ignore();
+
+
+            if (this->drones.find(drone_id) == this->drones.end())
+            {
+                this->drones.insert(
+                    std::pair<int, Drone>(
+                        drone_id, Drone(drone_id, drone_x, drone_y, emergency, battery)
+                    )
+                );
+            }
+            else
+            {
+                // this->drones.at(drone_id).update_position(drone_x, drone_y);
+                this->drones.at(drone_id).update_emergency(emergency);
+                this->drones.at(drone_id).update_battery(battery);
+            }
+        }
+
+        void update_saved_scans()
+        {
+            int scan_count;
+            std::cin >> scan_count;
+            std::cin.ignore();
+            for (int i = 0; i < scan_count; i++)
+            {
+                int creature_id;
+                std::cin >> creature_id;
+                std::cin.ignore();
+                this->saved_scans.insert(creature_id);
+            }
+        }
+
+        void update_unsaved_scans(int drone_id, int creature_id)
+        {
+            this->drones.at(drone_id).scaned_creatures_id.push_back(creature_id);
+        }
+
+        void moveDrone(int drone_id, int x, int y, bool light)
+        {
+            this->drones.at(drone_id).update_position(x, y);
+            this->drones.at(drone_id).light = light;
+
+            if (light)
+                this->drones.at(drone_id).battery -= 5;
+            else
+                this->drones.at(drone_id).battery += 1;
+        }
+
+        void update_score(const int & new_score)
+        {
+            this->score = new_score;
+        }
+
+};
+
+#endif // PLAYER_HPP
+
+int main()
+{
+
+    Player me;
+    Player foe;
+    std::map<int, Creature> creatures;
+
+    parse_creatures(creatures);
+
+    // game loop
+    while (1)
+    {
+
+        update_score(me, foe);
+
+        me.update_saved_scans();
+        foe.update_saved_scans();
+
+        me.update_drones();
+        foe.update_drones();
+
+        update_unsaved_scans(me, foe);
+
+        update_visible_creatures(creatures);
+
+        update_blips(me, foe);
+
+        // For each drone
+
+        std::string direction = "DOWN";
+
+        for (size_t i = 0; i < me.drones.size(); i++)
+        {
+
+            // Write an action using cout. DON'T FORGET THE "<< endl"
+            // To debug: cerr << "Debug messages..." << endl;
+
+            // if (purchased_by_enemy())
+            //      runaway();
+            // else if (ascending())
+            //      go_up()
+            // else
+            //      go_down()
+
+            // std::cout << "WAIT 1" << std::endl; // MOVE <x> <y> <light (1|0)> | WAIT <light (1|0)>
+
+            if (me.drones.at(i).position[0] < 500 && direction == "LEFT")
+            {
+                me.drones.at(i).direction_right();
+                direction = "RIGHT";
+            }
+            else if (me.drones.at(i).position[0] >= 9500 && direction == "RIGHT")
+            {
+                me.drones.at(i).direction_left();
+                direction = "LEFT";
+            }
+
+            else if (me.drones.at(i).position[1] < 200 && direction == "UP")
+            {
+                me.drones.at(i).direction_down();
+                direction = "DOWN";
+            }
+            else if (me.drones.at(i).position[1] >= 9500 && direction == "DOWN")
+            {
+                me.drones.at(i).direction_up();
+                direction = "UP";
+            }
+
+
+
+            me.drones.at(i).move();
+            std::cerr << "Direction : " << direction << " this->dir = " << me.drones.at(i).direction <<  " this->position = " << me.drones.at(i).position << std::endl;
+        }
+    }
+}
+
+class Creature;
+class Player;
+
+void update_score(Player &me, Player &foe)
+{
+    int my_score;
+    std::cin >> my_score;
+    std::cin.ignore();
+    me.update_score(my_score);
+
+    int enemy_score;
+    std::cin >> enemy_score;
+    std::cin.ignore();
+    foe.update_score(enemy_score);
+}
+
+void parse_creatures(std::map<int, Creature> &creatures)
+{
+
+    // Number of creatures int the game zone, (will always be 12)
+    int creature_count;
+    std::cin >> creature_count;
+    std::cin.ignore();
+
+    for (int i = 0; i < creature_count; i++)
+    {
+
+        // Creature description
+        int creature_id; // (unique creature id)
+        int color;       // (0 to 3)
+        int type;        // (0 to 2)
+
+        std::cin >> creature_id >> color >> type;
+        std::cin.ignore();
+
+        creatures.insert(std::pair<int, Creature>(creature_id, Creature(creature_id, color, type)));
+    }
+}
+
+void update_unsaved_scans(Player &me, Player &foe)
+{
+    int drone_scan_count;
+    std::cin >> drone_scan_count;
+    std::cin.ignore();
+
+    for (int i = 0; i < drone_scan_count; i++)
+    {
+        int drone_id;
+        int creature_id;
+        std::cin >> drone_id >> creature_id;
+        std::cin.ignore();
+
+        // If the drone_id is in the map of my drones
+        if (me.drones.find(drone_id) != me.drones.end())
+            me.update_unsaved_scans(drone_id, creature_id);
+        else
+            foe.update_unsaved_scans(drone_id, creature_id);
+    }
+}
+
+void update_visible_creatures(std::map<int, Creature> &creatures)
+{
+    int visible_creature_count;
+    std::cin >> visible_creature_count;
+    std::cin.ignore();
+
+    // Reset visibility of all creatures
+    // Iterators :
+    std::map<int, Creature>::iterator it = creatures.begin();
+
+    while (it != creatures.end())
+    {
+        it->second.reset_visibility();
+        ++it;
+    }
+
+    for (int i = 0; i < visible_creature_count; i++)
+    {
+        int creature_id;
+        int creature_x;
+        int creature_y;
+        int creature_vx;
+        int creature_vy;
+        std::cin >> creature_id >> creature_x >> creature_y >> creature_vx >> creature_vy;
+        std::cin.ignore();
+
+        // Creature is visible
+        creatures.at(creature_id).update_position(creature_x, creature_y);
+        creatures.at(creature_id).update_velocity(creature_vx, creature_vy);
+        creatures.at(creature_id).update_visibility(true);
+    }
+}
+
+void update_blips(Player &me, Player &foe)
+{
+    int blip_count;
+    std::cin >> blip_count;
+    std::cin.ignore();
+
+    // Restore blips ?
+
+    for (int i = 0; i < blip_count; i++)
+    {
+        int drone_id;
+        int creature_id;
+        std::string blip;
+        std::cin >> drone_id >> creature_id >> blip;
+        std::cin.ignore();
+
+        if (me.drones.find(drone_id) != me.drones.end())
+            me.drones.at(drone_id).add_blip(creature_id, blip);
+        else
+            foe.drones.at(drone_id).add_blip(creature_id, blip);
+    }
+}

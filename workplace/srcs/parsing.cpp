@@ -1,5 +1,21 @@
 #include "main.hpp"
 
+class Creature;
+class Player;
+
+void update_score(Player &me, Player &foe)
+{
+    int my_score;
+    std::cin >> my_score;
+    std::cin.ignore();
+    me.update_score(my_score);
+
+    int enemy_score;
+    std::cin >> enemy_score;
+    std::cin.ignore();
+    foe.update_score(enemy_score);
+}
+
 void parse_creatures(std::map<int, Creature> &creatures)
 {
 
@@ -70,13 +86,10 @@ void update_visible_creatures(std::map<int, Creature> &creatures)
         std::cin >> creature_id >> creature_x >> creature_y >> creature_vx >> creature_vy;
         std::cin.ignore();
 
-        if (creatures.find(creature_id) != creatures.end())
-        {
-            // Creature is visible
-            creatures.at(creature_id).update_position(creature_x, creature_y);
-            creatures.at(creature_id).update_velocity(creature_vx, creature_vy);
-            creatures.at(creature_id).update_visibility(true);
-        }
+        // Creature is visible
+        creatures.at(creature_id).update_position(creature_x, creature_y);
+        creatures.at(creature_id).update_velocity(creature_vx, creature_vy);
+        creatures.at(creature_id).update_visibility(true);
     }
 }
 

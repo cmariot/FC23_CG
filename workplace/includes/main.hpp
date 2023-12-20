@@ -7,11 +7,20 @@
 #include <iostream>
 #include <unordered_set>
 
+class Creature;
+class Player;
+namespace ft
+{
+    template <typename T>
+    class Vector;
+}
+
+# include "vector.hpp"
 # include "Creature.hpp"
 # include "Drone.hpp"
 # include "Player.hpp"
-# include "vector.hpp"
 
+void update_score(Player &me, Player &foe);
 void parse_creatures(std::map<int, Creature> &creatures);
 void update_unsaved_scans(Player &me, Player &foe);
 void update_visible_creatures(std::map<int, Creature> &creatures);

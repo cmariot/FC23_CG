@@ -17,8 +17,6 @@ class Player
 
         Player(void)
         {
-            std::cin >> this->score;
-            std::cin.ignore();
             this->drones = std::map<int, Drone>();
         }
 
@@ -42,11 +40,21 @@ class Player
             std::cin >> drone_id >> drone_x >> drone_y >> emergency >> battery;
             std::cin.ignore();
 
-            this->drones.insert(
-                std::pair<int, Drone>(
-                    drone_id, Drone(drone_id, drone_x, drone_y, emergency, battery)
-                )
-            );
+
+            if (this->drones.find(drone_id) == this->drones.end())
+            {
+                this->drones.insert(
+                    std::pair<int, Drone>(
+                        drone_id, Drone(drone_id, drone_x, drone_y, emergency, battery)
+                    )
+                );
+            }
+            else
+            {
+                // this->drones.at(drone_id).update_position(drone_x, drone_y);
+                this->drones.at(drone_id).update_emergency(emergency);
+                this->drones.at(drone_id).update_battery(battery);
+            }
         }
 
         void update_saved_scans()
@@ -78,6 +86,12 @@ class Player
             else
                 this->drones.at(drone_id).battery += 1;
         }
+
+        void update_score(const int & new_score)
+        {
+            this->score = new_score;
+        }
+
 };
 
 #endif // PLAYER_HPP
