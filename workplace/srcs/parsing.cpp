@@ -51,8 +51,14 @@ void update_visible_creatures(std::map<int, Creature> &creatures)
     std::cin.ignore();
 
     // Reset visibility of all creatures
-    for (auto &creature : creatures)
-        creature.second.reset_visibility();
+    // Iterators :
+    std::map<int, Creature>::iterator it = creatures.begin();
+
+    while (it != creatures.end())
+    {
+        it->second.reset_visibility();
+        ++it;
+    }
 
     for (int i = 0; i < visible_creature_count; i++)
     {

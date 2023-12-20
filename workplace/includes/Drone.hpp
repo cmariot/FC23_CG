@@ -7,8 +7,7 @@ class Drone
     public:
 
         int id;
-        int x;
-        int y;
+        ft::Vector<int> position;
         int emergency;
         int battery;
         bool light;
@@ -18,8 +17,9 @@ class Drone
         Drone(int id, int x, int y, int emergency, int battery)
         {
             this->id = id;
-            this->x = x;
-            this->y = y;
+            this->position = ft::Vector<int>(2);
+            this->position[0] = x;
+            this->position[1] = y;
             this->emergency = emergency;
             this->battery = battery;
             this->scaned_creatures_id = std::vector<int>();
@@ -30,8 +30,8 @@ class Drone
 
         void update_position(int x, int y)
         {
-            this->x = x;
-            this->y = y;
+            this->position[0] = x;
+            this->position[1] = y;
         }
 
         void update_emergency(int emergency)

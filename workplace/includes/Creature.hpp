@@ -1,6 +1,7 @@
 #ifndef CREATURE_HPP
 # define CREATURE_HPP
 
+#include "vector.hpp"
 class Creature
 {
 
@@ -13,12 +14,10 @@ class Creature
         bool is_visible;
 
         // Position
-        int x;
-        int y;
+        ft::Vector<int> position;
 
         // Velocity
-        int vx;
-        int vy;
+        ft::Vector<int> velocity;
 
         Creature(int id, int color, int type)
         {
@@ -30,14 +29,14 @@ class Creature
 
         void update_position(int x, int y)
         {
-            this->x = x;
-            this->y = y;
+            this->position[0] = x;
+            this->position[1] = y;
         }
 
         void update_velocity(int vx, int vy)
         {
-            this->vx = vx;
-            this->vy = vy;
+            this->velocity[0] = vx;
+            this->velocity[1] = vy;
         }
 
         void update_visibility(bool is_visible)

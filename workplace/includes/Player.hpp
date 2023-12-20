@@ -70,8 +70,7 @@ class Player
 
         void moveDrone(int drone_id, int x, int y, bool light)
         {
-            this->drones.at(drone_id).x = x;
-            this->drones.at(drone_id).y = y;
+            this->drones.at(drone_id).update_position(x, y);
             this->drones.at(drone_id).light = light;
 
             if (light)

@@ -16,6 +16,7 @@ INC_FILES	= main.hpp \
 			  Creature.hpp \
 			  Drone.hpp \
 			  Player.hpp \
+			  vector.hpp
 
 
 INC_PATH	=	includes/

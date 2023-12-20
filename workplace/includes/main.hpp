@@ -10,6 +10,7 @@
 # include "Creature.hpp"
 # include "Drone.hpp"
 # include "Player.hpp"
+# include "vector.hpp"
 
 void parse_creatures(std::map<int, Creature> &creatures);
 void update_unsaved_scans(Player &me, Player &foe);
